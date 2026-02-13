@@ -1,0 +1,6 @@
+# directory
+env/
+
+# db
+*.db
+

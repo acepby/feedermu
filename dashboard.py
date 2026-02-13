@@ -262,7 +262,7 @@ st.set_page_config(page_title="RSS Item Monitor", layout="wide")
 init_db()
 start_scheduler()
 
-st.title("📰 Individual Article Monitor")
+st.title("📰 Monitor Web Muhammadiyah")
 
 # Sidebar
 with st.sidebar:
