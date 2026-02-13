@@ -271,8 +271,8 @@ with st.sidebar:
         inst = st.text_input("Institution")
         dom = st.text_input("Domain")
         c1, c2 = st.columns(2)
-        lat = c1.number_input("Lat", -7.8, format="%.6f")
-        lon = c2.number_input("Lon", 110.3, format="%.6f")
+        lat = c1.number_input("Lat", value=-7.8, format="%.6f")
+        lon = c2.number_input("Lon", value=110.3, format="%.6f")
         if st.form_submit_button("Add"):
             if inst and dom:
                 ok, msg = add_target(inst, dom, lat, lon)
