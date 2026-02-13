@@ -335,7 +335,7 @@ with t1:
                     "url": st.column_config.LinkColumn("Link"),
                     "found_at": st.column_config.DatetimeColumn("Detected At", format="D MMM HH:mm")
                 },
-                use_container_width=True,
+                width='stretch',
                 hide_index=True
             )
         else:
@@ -349,7 +349,7 @@ with t2:
     df = get_targets()
     if not df.empty:
         df['rss_flag'] = df['rss_flag'].apply(lambda x: "✅" if x==1 else "❌")
-        st.dataframe(df[['institution', 'domain', 'rss_flag', 'last_checked']], use_container_width=True)
+        st.dataframe(df[['institution', 'domain', 'rss_flag', 'last_checked']], width='stretch')
 
 # TAB 3: MAP
 with t3:
