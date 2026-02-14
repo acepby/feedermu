@@ -177,14 +177,51 @@ def edit_target_details(id, new_inst, new_dom, new_lat, new_lon):
 
 # --- BACKEND: CRAWLER ---
 def find_rss_url(soup, base_url):
+    """
+    Attempts to find an RSS feed URL by:
+    1. Looking for <link> tags in the HTML head.
+    2. Brute-forcing common feed paths.
+    """
+    # 1. Priority: Check HTML <head> for auto-discovery links
     link = soup.find('link', type='application/rss+xml')
-    if link and link.get('href'): return link.get('href')
-    common = ['/feed/', '/rss/', '/rss.xml', '/blog/feed/','/rss/latest-posts']
-    for path in common:
+    if link and link.get('href'): 
+        return link.get('href')
+    
+    link = soup.find('link', type='application/atom+xml')
+    if link and link.get('href'): 
+        return link.get('href')
+
+    # 2. Fallback: Check common paths (Brute-force)
+    common_paths = [
+        '/feed/',           # WordPress / General
+        '/rss/',            # General
+        '/rss.xml',         # Static sites
+        '/feed.xml',        # Jekyll / Static
+        '/atom.xml',        # Atom feeds
+        '/index.xml',       # Hugo
+        '/blog/feed/',      # Sub-folder blogs
+        '/news/feed/',      # News sections
+        '/?feed=rss2',      # WordPress legacy
+        '/rss/latest-posts' # Custom CMS
+    ]
+    
+    print(f"🔎 No RSS tag found. Checking common paths for {base_url}...")
+    
+    for path in common_paths:
         try:
-            full = urljoin(base_url, path)
-            if requests.head(full, headers=HEADERS, timeout=2).status_code == 200: return full
-        except: continue
+            full_url = urljoin(base_url, path)
+            # Use HEAD request to check if it exists without downloading the whole thing
+            response = requests.head(full_url, headers=HEADERS, timeout=3, allow_redirects=True)
+            
+            if response.status_code == 200:
+                # Optional: Check content-type to be sure it's XML
+                content_type = response.headers.get('Content-Type', '').lower()
+                if 'xml' in content_type or 'rss' in content_type:
+                    print(f"✅ Found hidden feed: {full_url}")
+                    return full_url
+        except Exception: 
+            continue
+            
     return None
 
 def scan_domain(target_row):
@@ -258,7 +295,7 @@ def start_scheduler():
     return t
 
 # --- FRONTEND ---
-st.set_page_config(page_title="RSS Item Monitor", layout="wide")
+st.set_page_config(page_title="MonitorMU", layout="wide")
 init_db()
 start_scheduler()
 
